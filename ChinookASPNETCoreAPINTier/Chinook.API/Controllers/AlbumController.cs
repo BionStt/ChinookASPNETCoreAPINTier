@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 using Chinook.Domain.Supervisor;
 using Chinook.Domain.ApiModels;
+using Microsoft.Extensions.Logging;
 
 namespace Chinook.API.Controllers
 {
@@ -15,10 +16,12 @@ namespace Chinook.API.Controllers
     public class AlbumController : Controller
     {
         private readonly IChinookSupervisor _chinookSupervisor;
+        private readonly ILogger<AlbumController> _logger;
 
-        public AlbumController(IChinookSupervisor chinookSupervisor)
+        public AlbumController(IChinookSupervisor chinookSupervisor,ILogger<AlbumController> logger)
         {
             _chinookSupervisor = chinookSupervisor;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -27,10 +30,12 @@ namespace Chinook.API.Controllers
         {
             try
             {
-                return new ObjectResult(await _chinookSupervisor.GetAllAlbumAsync(ct));
+                var albums = new ObjectResult(await _chinookSupervisor.GetAllAlbumAsync(ct));
+                return albums;
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Exception-Album-Get");
                 return StatusCode(500, ex);
             }
         }

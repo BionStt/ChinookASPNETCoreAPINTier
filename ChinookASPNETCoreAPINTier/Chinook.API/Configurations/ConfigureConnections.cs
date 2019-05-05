@@ -1,9 +1,11 @@
-﻿using System;
+﻿// This line needs to be changed for the desired Data project: DataEFCore, DataEFCoreCmpldQry
+using Chinook.DataEFCoreCmpldQry;
+//
+using System;
 using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Chinook.DataEFCoreCmpldQry;
 using Chinook.Domain.DbInfo;
 
 namespace Chinook.API.Configurations

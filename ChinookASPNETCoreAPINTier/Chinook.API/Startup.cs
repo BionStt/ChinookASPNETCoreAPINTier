@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Chinook.API.Configurations;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Chinook.API
@@ -14,15 +18,16 @@ namespace Chinook.API
 
         public Startup(IConfiguration configuration)
         {
+            Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(configuration).CreateLogger();
             Configuration = configuration;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMemoryCache();            
-            services.AddResponseCaching();            
-            services.AddMvc();
+            services.AddMemoryCache();
+            services.AddMvc().AddFluentValidation();
+            services.AddResponseCaching();
 
             services.ConfigureRepositories()
                 .ConfigureSupervisor()
@@ -30,6 +35,21 @@ namespace Chinook.API
                 .AddCorsConfiguration()
                 .AddConnectionProvider(Configuration)
                 .AddAppSettings(Configuration);
+                //.ConfigureValidators();
+            
+            /*services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = (context) =>
+                {
+                    var errors = context.ModelState.Values.SelectMany(x => x.Errors.Select(p => p.ErrorMessage)).ToList();
+                    var result = new
+                    {
+                        Message = "Validation errors",
+                        Errors = errors
+                    };
+                    return new BadRequestObjectResult(result);
+                };
+            });*/
 
             services.AddSwaggerGen(s => s.SwaggerDoc("v1", new Info
             {
@@ -45,6 +65,8 @@ namespace Chinook.API
             {
                 app.UseDeveloperExceptionPage();
             }
+            
+            loggerFactory.AddSerilog();
 
             app.UseCors("AllowAll");
             app.UseStaticFiles();

@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 using Chinook.Domain.Supervisor;
 using Chinook.Domain.ApiModels;
+using Microsoft.Extensions.Logging;
 
 namespace Chinook.API.Controllers
 {
@@ -15,10 +16,12 @@ namespace Chinook.API.Controllers
     public class EmployeeController : Controller
     {
         private readonly IChinookSupervisor _chinookSupervisor;
+        private readonly ILogger<EmployeeController> _logger;
 
-        public EmployeeController(IChinookSupervisor chinookSupervisor)
+        public EmployeeController(IChinookSupervisor chinookSupervisor,ILogger<EmployeeController> logger)
         {
             _chinookSupervisor = chinookSupervisor;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -31,6 +34,7 @@ namespace Chinook.API.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Exception-Employee-Get");
                 return StatusCode(500, ex);
             }
         }

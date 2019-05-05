@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using System.Diagnostics;
 using Chinook.Domain.Supervisor;
 using Chinook.Domain.ApiModels;
+using Microsoft.Extensions.Logging;
 
 namespace Chinook.API.Controllers
 {
@@ -16,12 +17,14 @@ namespace Chinook.API.Controllers
     public class MediaTypeController : Controller
     {
         private readonly IChinookSupervisor _chinookSupervisor;
+        private readonly ILogger<MediaTypeController> _logger;
 
-        public MediaTypeController(IChinookSupervisor chinookSupervisor)
+        public MediaTypeController(IChinookSupervisor chinookSupervisor,ILogger<MediaTypeController> logger)
         {
             _chinookSupervisor = chinookSupervisor;
+            _logger = logger;
         }
-
+        
         [HttpGet]
         [Produces(typeof(List<MediaTypeApiModel>))]
         [ResponseCache(Duration = 604800)] // cache for a week
@@ -33,6 +36,7 @@ namespace Chinook.API.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Exception-MediaType-Get");
                 return StatusCode(500, ex);
             }
         }

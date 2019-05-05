@@ -1,10 +1,18 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Chinook.API.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly ILogger<HomeController> _logger;
+
+        public HomeController(ILogger<HomeController> logger)
+        {
+            _logger = logger;
+        }
+
         [HttpGet]
         [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult Index()
@@ -16,6 +24,7 @@ namespace Chinook.API.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Exception-Home-Index");
                 return StatusCode(500, ex);
             }
         }
